@@ -2,9 +2,9 @@
 
 namespace Cierra\Auth\Tests;
 
+use Cierra\Auth\SkeletonServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Cierra\Auth\SkeletonServiceProvider;
 
 class TestCase extends Orchestra
 {
