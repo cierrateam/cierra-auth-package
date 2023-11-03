@@ -22,4 +22,16 @@ class AuthServiceProvider extends PackageServiceProvider
             // ->hasMigration('create_skeleton_table')
             ->hasCommand(CierraAuthCommand::class);
     }
+
+
+    /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+    }
 }
