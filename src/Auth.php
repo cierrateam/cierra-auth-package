@@ -1,11 +1,10 @@
 <?php
 
 namespace Cierra\Auth;
-use Illuminate\Support\Facades\Http;
 
 class Auth
 {
-    public static function getLoginUrl() 
+    public static function getLoginUrl()
     {
         $queryParams = [
             'client_id' => config('cierra-auth-package.client_id'),
@@ -13,8 +12,7 @@ class Auth
             'response_type' => 'code',
             'scope' => '',
         ];
-        return config('cierra-auth-package.host') . '/oauth/authorize?' . http_build_query($queryParams);
+
+        return config('cierra-auth-package.host').'/oauth/authorize?'.http_build_query($queryParams);
     }
-
-
 }

@@ -23,7 +23,6 @@ class AuthServiceProvider extends PackageServiceProvider
             ->hasCommand(CierraAuthCommand::class);
     }
 
-
     /**
      * Bootstrap services.
      *

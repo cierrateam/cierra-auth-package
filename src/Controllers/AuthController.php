@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Cierra\Auth\Controllers;
 
 use App\Models\User;
@@ -22,11 +21,11 @@ class AuthController extends Controller
 
         $code = request()->code;
 
-        if (!$code) {
+        if (! $code) {
             return redirect()->route('cierra-auth.login');
         }
 
-        $tokenRes = Http::post(config('cierra-auth-package.host') . '/oauth/token', [
+        $tokenRes = Http::post(config('cierra-auth-package.host').'/oauth/token', [
             'grant_type' => 'authorization_code',
             'client_id' => config('cierra-auth-package.client_id'),
             'client_secret' => config('cierra-auth-package.client_secret'),
@@ -34,13 +33,13 @@ class AuthController extends Controller
             'code' => request()->code,
         ]);
 
-        if (!$tokenRes->ok()) {
+        if (! $tokenRes->ok()) {
             return redirect()->route('cierra-auth.login');
         }
 
         $tokenRes = $tokenRes->json();
 
-        if (!isset($tokenRes['access_token'])) {
+        if (! isset($tokenRes['access_token'])) {
             return redirect()->route('cierra-auth.login');
         }
 
@@ -49,12 +48,12 @@ class AuthController extends Controller
         // dd($token);
         //get user info
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-            'Accept' => 'application/json'
-        ])->get(config('cierra-auth-package.host') . '/api/user');
+            'Authorization' => 'Bearer '.$token,
+            'Accept' => 'application/json',
+        ])->get(config('cierra-auth-package.host').'/api/user');
 
-        if (!$response->ok()) {
-            dd($response->status() , $response->json());
+        if (! $response->ok()) {
+            dd($response->status(), $response->json());
             throw new \Exception('Error getting user info');
         }
 
@@ -71,12 +70,12 @@ class AuthController extends Controller
             'email_verified_at' => $passportUser['email_verified_at'],
         ];
 
-        if(Schema::hasColumn('users', 'name')){
-            $userData['name'] = $passportUser['first_name'] . ' ' . $passportUser['last_name'];
+        if (Schema::hasColumn('users', 'name')) {
+            $userData['name'] = $passportUser['first_name'].' '.$passportUser['last_name'];
         }
 
         //if there is a password field, fill it with random string
-        if(Schema::hasColumn('users', 'password')){
+        if (Schema::hasColumn('users', 'password')) {
             $userData['password'] = bcrypt(Str::random(16));
         }
 
