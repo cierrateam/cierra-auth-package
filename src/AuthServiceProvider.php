@@ -2,9 +2,9 @@
 
 namespace Cierra\Auth;
 
+use Cierra\Auth\Commands\CierraAuthCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Cierra\Auth\Commands\CierraAuthCommand;
 
 class AuthServiceProvider extends PackageServiceProvider
 {
