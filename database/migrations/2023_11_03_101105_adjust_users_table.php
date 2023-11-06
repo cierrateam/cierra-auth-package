@@ -50,12 +50,12 @@ return new class extends Migration
                 if (!Schema::hasColumn('users', $col['name'])) {
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable();
                 }
-                if (isset($col['unique'])) {
-                    $table->unique($col['name']);
-                }
-                if (isset($col['index'])) {
-                    $table->index($col['name']);
-                }
+                // if (isset($col['unique'])) {
+                //     $table->unique($col['name']);
+                // }
+                // if (isset($col['index'])) {
+                //     $table->index($col['name']);
+                // }
             }
         });
     }
