@@ -31,23 +31,23 @@ return new class extends Migration
                 [
                     'name' => 'cierra_auth_id',
                     'type' => 'unsignedBigInteger',
-                    'index' => true
+                    'index' => true,
                 ],
                 [
                     'name' => 'token_expires_in',
-                    'type' => 'timestamp'
+                    'type' => 'timestamp',
                 ],
                 [
                     'name' => 'refresh_token',
                 ],
                 [
                     'name' => 'email_verified_at',
-                    'type' => 'timestamp'
+                    'type' => 'timestamp',
                 ],
             ];
 
             foreach ($cols as $col) {
-                if (!Schema::hasColumn('users', $col['name'])) {
+                if (! Schema::hasColumn('users', $col['name'])) {
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable();
                 }
                 // if (isset($col['unique'])) {

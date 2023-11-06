@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Cierra\Auth\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
