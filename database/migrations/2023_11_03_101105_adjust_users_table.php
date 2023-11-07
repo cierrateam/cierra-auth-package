@@ -27,7 +27,7 @@ return new class extends Migration
                 ],
                 [
                     'name' => 'token',
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 [
                     'name' => 'cierra_auth_id',
@@ -40,7 +40,7 @@ return new class extends Migration
                 ],
                 [
                     'name' => 'refresh_token',
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 [
                     'name' => 'email_verified_at',
