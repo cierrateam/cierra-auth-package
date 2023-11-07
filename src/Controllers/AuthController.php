@@ -59,7 +59,6 @@ class AuthController extends Controller
 
         $passportUser = $response->json();
 
-        dd($passportUser);
         $userData = [
             'cierra_auth_id' => $passportUser['id'],
             'first_name' => $passportUser['first_name'],
