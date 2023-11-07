@@ -64,8 +64,8 @@ class AuthController extends Controller
             'first_name' => $passportUser['first_name'],
             'last_name' => $passportUser['last_name'],
             'token' => $token,
-            'refresh_token' => isset($tokenRes->json()['refresh_token']) ? $tokenRes->json()['refresh_token'] : null,
-            'token_expires_in' => isset($tokenRes->json()['expires_in']) ? $tokenRes->json()['expires_in'] : null,
+            'refresh_token' => isset($tokenRes['refresh_token']) ? $tokenRes['refresh_token'] : null,
+            'token_expires_in' => isset($tokenRes['expires_in']) ? $tokenRes['expires_in'] : null,
             'email_verified_at' => $passportUser['email_verified_at'],
         ];
 
