@@ -65,7 +65,7 @@ class AuthController extends Controller
             'last_name' => $passportUser['last_name'],
             'token' => $token,
             'refresh_token' => isset($tokenRes['refresh_token']) ? $tokenRes['refresh_token'] : null,
-            'token_expires_in' => isset($tokenRes['expires_in']) ? $tokenRes['expires_in'] : null,
+            'token_expires_in' => isset($tokenRes['expires_in']) ? now()->addSeconds($tokenRes['expires_in']) : null,
             'email_verified_at' => $passportUser['email_verified_at'],
         ];
 
