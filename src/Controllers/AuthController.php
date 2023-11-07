@@ -85,9 +85,8 @@ class AuthController extends Controller
             $userData
         );
 
-        FacadesAuth::login($user);
+        FacadesAuth::guard('web')->login($user);
 
-        // dd(FacadesAuth::user());
 
         return redirect(config('cierra-auth-package.redirect_after_login'));
     }
