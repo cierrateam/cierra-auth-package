@@ -85,7 +85,6 @@ class AuthController extends Controller
             $userData
         );
 
-
         FacadesAuth::login($user);
 
         dd(FacadesAuth::user());
