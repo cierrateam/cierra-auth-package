@@ -137,7 +137,7 @@ class AuthController extends Controller
         //remove // at the end of the url
         $redirectAfterLogout = rtrim($redirectAfterLogout, '/');
 
-        dd(config('cierra-auth-package.host').'/logout?redirect_after_logout='.$redirectAfterLogout);
+        // dd(config('cierra-auth-package.host').'/logout?redirect_after_logout='.$redirectAfterLogout);
 
         return redirect(config('cierra-auth-package.host').'/logout?redirect_after_logout='.$redirectAfterLogout);
     }
