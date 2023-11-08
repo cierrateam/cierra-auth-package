@@ -96,6 +96,7 @@ class AuthController extends Controller
             }
             $user->switchTeam($team);
         }
+        dd($user->currentTeam);
 
         //get current session driver
         // $sessionDriver = config('session.driver');
