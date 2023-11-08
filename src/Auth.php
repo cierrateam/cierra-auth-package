@@ -2,6 +2,8 @@
 
 namespace Cierra\Auth;
 
+use Illuminate\Support\Facades\Auth as FacadesAuth;
+
 class Auth
 {
     public static function getLoginUrl()
@@ -14,5 +16,11 @@ class Auth
         ];
 
         return config('cierra-auth-package.host').'/oauth/authorize?'.http_build_query($queryParams);
+    }
+
+    //get user function
+    public static function user()
+    {
+        return FacadesAuth::user();
     }
 }
