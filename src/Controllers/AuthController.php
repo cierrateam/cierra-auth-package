@@ -2,6 +2,7 @@
 
 namespace Cierra\Auth\Controllers;
 
+use App\Models\Team;
 use App\Models\User;
 use Cierra\Auth\Auth;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
@@ -21,11 +22,11 @@ class AuthController extends Controller
 
         $code = request()->code;
 
-        if (! $code) {
+        if (!$code) {
             return redirect()->route('cierra-auth.login');
         }
 
-        $tokenRes = Http::post(config('cierra-auth-package.host').'/oauth/token', [
+        $tokenRes = Http::post(config('cierra-auth-package.host') . '/oauth/token', [
             'grant_type' => 'authorization_code',
             'client_id' => config('cierra-auth-package.client_id'),
             'client_secret' => config('cierra-auth-package.client_secret'),
@@ -33,13 +34,13 @@ class AuthController extends Controller
             'code' => request()->code,
         ]);
 
-        if (! $tokenRes->ok()) {
+        if (!$tokenRes->ok()) {
             return redirect()->route('cierra-auth.login');
         }
 
         $tokenRes = $tokenRes->json();
 
-        if (! isset($tokenRes['access_token'])) {
+        if (!isset($tokenRes['access_token'])) {
             return redirect()->route('cierra-auth.login');
         }
 
@@ -48,11 +49,11 @@ class AuthController extends Controller
         // dd($token);
         //get user info
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer '.$token,
+            'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
-        ])->get(config('cierra-auth-package.host').'/api/user');
+        ])->get(config('cierra-auth-package.host') . '/api/user');
 
-        if (! $response->ok()) {
+        if (!$response->ok()) {
             dd($response->status(), $response->json());
             throw new \Exception('Error getting user info');
         }
@@ -70,7 +71,7 @@ class AuthController extends Controller
         ];
 
         if (Schema::hasColumn('users', 'name')) {
-            $userData['name'] = $passportUser['first_name'].' '.$passportUser['last_name'];
+            $userData['name'] = $passportUser['first_name'] . ' ' . $passportUser['last_name'];
         }
 
         //if there is a password field, fill it with random string
@@ -87,15 +88,23 @@ class AuthController extends Controller
 
         //check user's current team and handle it
         $team = $user->currentTeam;
-        if (! $team) {
+        if (!$team) {
             $team = $user->ownedTeams()->first();
-            if (! $team) {
-                $team = $user->createTeam([
-                    'name' => $user->first_name.'\'s team',
-                ]);
+            if (!$team) {
+                //Call to undefined method App\Models\User::createTeam()
+                $team = new Team();
+                $team->user_id = $user->id;
+                $team->name = $user->first_name . ' ' . $user->last_name;
+                $team->personal_team = true;
+                $team->save();
+
+                // Attach the user to the team.
+                $user->teams()->attach($team->id, ['role' => 'admin']);
             }
             $user->switchTeam($team);
+            $user = $user->fresh();
         }
+     
         dd($user->currentTeam);
 
         //get current session driver
