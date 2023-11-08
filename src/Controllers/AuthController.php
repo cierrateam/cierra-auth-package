@@ -86,7 +86,7 @@ class AuthController extends Controller
         );
 
         FacadesAuth::login($user);
-
+        session(['key11' => 'valueee']);
         return redirect(config('cierra-auth-package.redirect_after_login'));
     }
 }
