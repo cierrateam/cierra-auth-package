@@ -8,4 +8,5 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'cierra-auth', 'middleware' => ['web', 'guest']], function () {
     Route::get('/login', [AuthController::class, 'login'])->name('cierra-auth.login');
     Route::get('/callback', [AuthController::class, 'callback'])->name('cierra-auth.callback');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('cierra-auth.logout');
 });
