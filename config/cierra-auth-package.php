@@ -6,4 +6,5 @@ return [
     'client_id' => env('CIERRA_AUTH_CLIENT_ID', 'client-id'),
     'client_secret' => env('CIERRA_AUTH_CLIENT_SECRET', 'client-secret'),
     'redirect_after_login' => env('CIERRA_AUTH_REDIRECT_AFTER_LOGIN', '/'),
+    'redirect_after_logout' => env('CIERRA_AUTH_REDIRECT_AFTER_LOGOUT', '/'),
 ];
