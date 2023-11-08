@@ -86,8 +86,8 @@ class AuthController extends Controller
         );
 
         //get current session driver
-        $sessionDriver = config('session.driver');
-        dd($sessionDriver);
+        // $sessionDriver = config('session.driver');
+        // dd($sessionDriver);
         FacadesAuth::login($user);
         session(['key11' => 'valueee']);
 
