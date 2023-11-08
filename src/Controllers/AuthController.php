@@ -88,10 +88,6 @@ class AuthController extends Controller
         );
 
         $user = $this->handleUserTeams($user);
-        
-     
-        dd($user->currentTeam);
-
    
         FacadesAuth::login($user);
 
