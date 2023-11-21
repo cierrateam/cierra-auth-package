@@ -49,9 +49,9 @@ return new class extends Migration
             ];
 
             foreach ($cols as $col) {
-                if (!Schema::hasColumn('users', $col['name'])) {
+                if (! Schema::hasColumn('users', $col['name'])) {
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable();
-                }else{
+                } else {
                     //update col type
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable()->change();
                 }
