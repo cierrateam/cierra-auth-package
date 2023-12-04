@@ -53,6 +53,16 @@ class AuthController extends Controller
             'Accept' => 'application/json',
         ])->get(config('cierra-auth-package.host').'/api/user');
 
+        // register app in admin panel, if the id is set in config
+        if(config('cierra-auth-package.registers_app_id'))  {
+            Http::withHeaders([
+                'Authorization' => 'Bearer '.$token,
+                'Accept' => 'application/json',
+            ])->post(config('cierra-auth-package.host').'/api/app/register', [
+                'application_id' => config('cierra-auth-package.registers_app_id'),
+            ]);
+        }
+
         if (! $response->ok()) {
             throw new \Exception('Error getting user info');
         }
