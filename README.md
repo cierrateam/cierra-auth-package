@@ -5,10 +5,13 @@ This package is installable to Jetstream Apps, to enable login with cierra AI ac
 
 You can install the package via composer, if you have the private composer of cierra configured in your repo:
 
+### Install the package
 ```bash
 composer require cierrateam/cierra-auth-package
 ```
 
+
+### Create the app in admin instance
 You should add a client to the Auth instance. This is possible with:
 
 ATTENTION: Run this on the Auth instance, not in your app.
@@ -16,6 +19,34 @@ ATTENTION: Run this on the Auth instance, not in your app.
 ```bash
 php artisan passport:client
 ```
+
+### Add .env variables
+Add the data to your .env in your project:
+
+```bash
+CIERRA_AUTH_HOST="https://admin.cierra.ai"
+CIERRA_AUTH_CLIENT_ID="ID_HERE"
+CIERRA_AUTH_CLIENT_SECRET="YOUR_SECRET"
+CIERRA_AUTH_REDIRECT_AFTER_LOGIN="/"
+CIERRA_APP_ID=2
+```
+
+
+### Add the redirect
+Go to `app/Http/Middleware/Authenticate.php` and update: 
+
+```php
+protected function redirectTo(Request $request): ?string
+{
+    return $request->expectsJson() ? null : route('cierra-auth.login');
+}
+```
+
+### Add redirect to new routes
+`route('cierra-auth.login')` for login and to `route('cierra-auth.logout')` for logout
+
+
+### Optional
 
 You can publish and run the migrations with:
 
@@ -28,19 +59,6 @@ You can publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="cierra-auth-package-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag=":package_slug-views"
 ```
 
 ## Usage
