@@ -19,16 +19,20 @@ ATTENTION: Run this on the Auth instance, not in your app.
 ```bash
 php artisan passport:client
 ```
+During the creation, you get asked for:
+USER: None
+NAME: App Name
+REDIRECT: domain.com/cierra-auth/callback
 
 ### Add .env variables
 Add the data to your .env in your project:
 
 ```bash
-CIERRA_AUTH_HOST="https://admin.cierra.ai"
+CIERRA_AUTH_HOST="https://dev.admin.cierra.ai"
 CIERRA_AUTH_CLIENT_ID="ID_HERE"
 CIERRA_AUTH_CLIENT_SECRET="YOUR_SECRET"
 CIERRA_AUTH_REDIRECT_AFTER_LOGIN="/"
-CIERRA_APP_ID=2
+CIERRA_APP_ID="GET IT FROM ADMIN PANEL"
 ```
 
 
