@@ -49,6 +49,12 @@ protected function redirectTo(Request $request): ?string
 ### Add redirect to new routes
 Replace `route('login')` with `route('cierra-auth.login')` for login and `route('logout')` to `route('cierra-auth.logout')` for logout
 
+### Migrate
+Run you migrations.
+```bash
+php artisan migrate
+```
+
 
 ### Optional
 
