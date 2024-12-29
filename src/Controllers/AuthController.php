@@ -77,7 +77,7 @@ class AuthController extends Controller
             'refresh_token' => isset($tokenRes['refresh_token']) ? $tokenRes['refresh_token'] : null,
             'token_expires_in' => isset($tokenRes['expires_in']) ? now()->addSeconds($tokenRes['expires_in']) : null,
             'email_verified_at' => $passportUser['email_verified_at'],
-            'cierra_auth_team_id' => $passportUser['current_team_id']
+            'cierra_auth_team_id' => $passportUser['current_team_id'],
         ];
 
         if (Schema::hasColumn('users', 'name')) {
