@@ -138,6 +138,7 @@ class AuthController extends Controller
         }
 
         $user->ownedTeams()->save(Team::forceCreate($data));
+
         return $user->ownedTeams()->first();
     }
 
