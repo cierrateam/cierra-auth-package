@@ -121,7 +121,7 @@ class AuthController extends Controller
         return $user->fresh();
     }
 
-    protected function createTeam(User $user): void
+    protected function createTeam(User $user): Team
     {
         $data = [
             'user_id' => $user->id,
@@ -138,6 +138,7 @@ class AuthController extends Controller
         }
 
         $user->ownedTeams()->save(Team::forceCreate($data));
+        return $user->ownedTeams()->first();
     }
 
     public function logout()
