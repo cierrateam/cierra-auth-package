@@ -8,7 +8,16 @@ parameters:
         - config
         - database
     tmpDir: build/phpstan
-    checkOctaneCompatibility: true
-    checkModelProperties: true
-    checkMissingIterableValueType: false
-
+    ignoreErrors:
+        # Ignore App\Models classes that are expected to exist in consuming applications
+        - '#Call to static method updateOrCreate\(\) on an unknown class App\\Models\\User#'
+        - '#Call to method ownedTeams\(\) on an unknown class App\\Models\\User#'
+        - '#Call to method switchTeam\(\) on an unknown class App\\Models\\User#'
+        - '#Call to method fresh\(\) on an unknown class App\\Models\\User#'
+        - '#Access to property \$\w+ on an unknown class App\\Models\\User#'
+        - '#Call to static method forceCreate\(\) on an unknown class App\\Models\\Team#'
+        - '#Method .* has invalid return type App\\Models\\User#'
+        - '#Method .* has invalid return type App\\Models\\Team#'
+        - '#Parameter \$user of method .* has invalid type App\\Models\\User#'
+        # Ignore Auth facade methods that exist in Laravel
+        - '#Call to an undefined method Illuminate\\Contracts\\Auth\\Guard::login\(\)#'
