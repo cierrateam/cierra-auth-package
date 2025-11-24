@@ -3,6 +3,7 @@
 namespace Cierra\Auth;
 
 use Cierra\Auth\Commands\CierraAuthCommand;
+use Cierra\Auth\Commands\GenerateOAuthClientCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -20,7 +21,8 @@ class AuthServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             // ->hasMigration('create_skeleton_table')
-            ->hasCommand(CierraAuthCommand::class);
+            ->hasCommand(CierraAuthCommand::class)
+            ->hasCommand(GenerateOAuthClientCommand::class);
     }
 
     /**

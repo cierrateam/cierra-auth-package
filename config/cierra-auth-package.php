@@ -9,4 +9,5 @@ return [
     'redirect_after_logout' => env('CIERRA_AUTH_REDIRECT_AFTER_LOGOUT', '/'),
 
     'registers_app_id' => env('CIERRA_APP_ID', null),
+    'client_enrollment_secret' => env('CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET', null),
 ];

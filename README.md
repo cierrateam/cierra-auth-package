@@ -12,7 +12,40 @@ composer require cierrateam/cierra-auth-package
 
 
 ### Create the app in admin instance
-You should add a client to the Auth instance. This is possible with:
+
+#### Option 1: Temporary Client for Development/Preview (Recommended for non-production)
+
+For development, preview, and CI environments, you can use the temporary client enrollment feature. This is only available on non-production instances.
+
+**Requirements:**
+- Access to the `CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET` (request from team lead)
+- Non-production environment only
+
+**Usage:**
+
+Add the required configuration to your `.env` file:
+```bash
+APP_URL="https://your-app.example.com"
+CIERRA_AUTH_HOST="https://dev.admin.cierra.ai"
+CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET="your-enrollment-secret"
+```
+
+Generate a temporary OAuth client (valid for 30 days):
+```bash
+php artisan cierra-auth:generate-oauth-client "My App Name"
+```
+
+The command will:
+1. Automatically generate the redirect URI from your `APP_URL` (e.g., `https://your-app.example.com/cierra-auth/callback`)
+2. Create a temporary OAuth client on the auth instance
+3. Display the client credentials (ID and secret)
+4. Optionally update your `.env` file with the credentials
+
+**Note:** Temporary clients expire after 30 days and are automatically removed.
+
+#### Option 2: Permanent Client (For Production)
+
+You should add a permanent client to the Auth instance. This is possible with:
 
 ATTENTION: Run this on the Auth instance, not in your app.
 

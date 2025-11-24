@@ -47,7 +47,7 @@ class AuthController extends Controller
         $token = $tokenRes['access_token'];
 
         // dd($token);
-        //get user info
+        // get user info
         $response = Http::withHeaders([
             'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
@@ -84,7 +84,7 @@ class AuthController extends Controller
             $userData['name'] = $passportUser['first_name'].' '.$passportUser['last_name'];
         }
 
-        //if there is a password field, fill it with random string
+        // if there is a password field, fill it with random string
         if (Schema::hasColumn('users', 'password')) {
             $userData['password'] = bcrypt(Str::random(16));
         }
@@ -147,16 +147,16 @@ class AuthController extends Controller
 
         FacadesAuth::logout();
 
-        //config('cierra-auth-package.redirect_after_logout') is the url to redirect after logout, it may be path or domain+path, the final result should be a valid url like domain+path
+        // config('cierra-auth-package.redirect_after_logout') is the url to redirect after logout, it may be path or domain+path, the final result should be a valid url like domain+path
         $redirectAfterLogout = config('cierra-auth-package.redirect_after_logout');
 
-        //check if includes domain
+        // check if includes domain
         if (strpos($redirectAfterLogout, 'http') === false) {
-            //if not, add domain
+            // if not, add domain
             $redirectAfterLogout = implode('/', [config('app.url'), $redirectAfterLogout]);
         }
 
-        //remove // at the end of the url
+        // remove // at the end of the url
         $redirectAfterLogout = rtrim($redirectAfterLogout, '/');
 
         // dd(config('cierra-auth-package.host').'/logout?redirect_after_logout='.$redirectAfterLogout);
