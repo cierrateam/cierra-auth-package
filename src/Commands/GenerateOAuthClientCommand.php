@@ -43,7 +43,7 @@ class GenerateOAuthClientCommand extends Command
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => "X-Client-Enrollment-Secret: {$enrollmentSecret}",
+                'X-Client-Enrollment-Secret' => "{$enrollmentSecret}",
                 'Accept' => 'application/json',
             ])->post("{$host}/api/oauth/clients/enroll", [
                 'name' => $clientName,
@@ -53,6 +53,14 @@ class GenerateOAuthClientCommand extends Command
             if (! $response->successful()) {
                 $this->error('Failed to create OAuth client.');
                 $this->error('Response: '.$response->body());
+                $this->error('Params used: '.json_encode([
+                    'name' => $clientName,
+                    'redirect' => $redirectUris,
+                ]));
+                $this->error('Headers used: '.json_encode([
+                    'Authorization' => "X-Client-Enrollment-Secret: {$enrollmentSecret}",
+                    'Accept' => 'application/json',
+                ]));
 
                 return self::FAILURE;
             }
@@ -68,12 +76,7 @@ class GenerateOAuthClientCommand extends Command
             $this->line("Expires At:    {$data['expires_at']}");
             $this->newLine();
 
-            // Ask if they want to update the .env file
-            if ($this->confirm('Would you like to update your .env file with these credentials?', true)) {
-                $this->updateEnvFile($data['client_id'], $data['client_secret']);
-            } else {
-                $this->warn('⚠ IMPORTANT: The client secret is shown only once. Make sure to save it securely!');
-            }
+            $this->updateEnvFile($data['client_id'], $data['client_secret']);
 
             return self::SUCCESS;
         } catch (\Exception $e) {
