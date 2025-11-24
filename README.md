@@ -25,26 +25,25 @@ For development, preview, and CI environments, you can use the temporary client 
 
 Add the enrollment secret to your `.env` file:
 ```bash
+APP_URL="https://your-app-domain.com"
 CIERRA_AUTH_HOST="https://dev.admin.cierra.ai"
 CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET="your-enrollment-secret"
 ```
 
 Generate a temporary OAuth client (valid for 30 days):
 ```bash
-php artisan cierra-auth:generate-oauth-client "My App Name" --redirect="https://example.com/cierra-auth/callback"
+php artisan cierra-auth:generate-oauth-client "My App Name"
 ```
 
-You can specify multiple redirect URIs:
-```bash
-php artisan cierra-auth:generate-oauth-client "My App" \
-  --redirect="https://example.com/cierra-auth/callback" \
-  --redirect="https://staging.example.com/cierra-auth/callback"
-```
+The command will automatically:
+1. Generate the redirect URI from your `APP_URL` environment variable (e.g., `https://example.com/cierra-auth/callback`)
+2. Create a temporary OAuth client on the auth instance
+3. Display the client credentials (ID and secret) and the redirect URI being used
+4. Optionally update your `.env` file with the credentials
 
-The command will:
-1. Create a temporary OAuth client on the auth instance
-2. Display the client credentials (ID and secret)
-3. Optionally update your `.env` file with the credentials
+**Requirements:**
+- `APP_URL` must be set in your `.env` file
+- `CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET` must be configured
 
 **Note:** Temporary clients expire after 30 days and are automatically removed.
 

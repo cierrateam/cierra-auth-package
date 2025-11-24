@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Http;
 class GenerateOAuthClientCommand extends Command
 {
     public $signature = 'cierra-auth:generate-oauth-client 
-                        {name : The name of the OAuth client}
-                        {--redirect=* : Redirect URIs for the OAuth client}';
+                        {name : The name of the OAuth client}';
 
     public $description = 'Generate a temporary OAuth client for development/preview environments';
 
@@ -32,30 +31,21 @@ class GenerateOAuthClientCommand extends Command
         // Get client name from argument
         $clientName = $this->argument('name');
 
-        // Get redirect URIs
-        $redirectUris = $this->option('redirect');
+        // Auto-generate redirect URI from APP_URL
+        $appUrl = config('app.url');
 
-        // If no redirect URIs provided, ask for them
-        if (empty($redirectUris)) {
-            $this->info('No redirect URIs provided. Please enter at least one redirect URI.');
-            $redirectUri = $this->ask('Enter redirect URI (e.g., https://example.com/oauth/callback)');
+        if (! $appUrl) {
+            $this->error('APP_URL is not set in your .env file.');
+            $this->info('Please add APP_URL to your .env file (e.g., APP_URL=https://example.com).');
 
-            if (! $redirectUri) {
-                $this->error('At least one redirect URI is required.');
-
-                return self::FAILURE;
-            }
-
-            $redirectUris = [$redirectUri];
-
-            // Ask if they want to add more
-            while ($this->confirm('Add another redirect URI?', false)) {
-                $redirectUri = $this->ask('Enter redirect URI');
-                if ($redirectUri) {
-                    $redirectUris[] = $redirectUri;
-                }
-            }
+            return self::FAILURE;
         }
+
+        // Generate the redirect URI using the app URL
+        $redirectUri = rtrim($appUrl, '/').'/cierra-auth/callback';
+        $redirectUris = [$redirectUri];
+
+        $this->info("Using redirect URI: {$redirectUri}");
 
         // Make the API request
         $this->info('Creating temporary OAuth client...');
