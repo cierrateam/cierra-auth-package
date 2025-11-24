@@ -2,7 +2,7 @@
 
 namespace Cierra\Auth\Tests;
 
-use Cierra\Auth\SkeletonServiceProvider;
+use Cierra\Auth\AuthServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -20,7 +20,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            SkeletonServiceProvider::class,
+            AuthServiceProvider::class,
         ];
     }
 
