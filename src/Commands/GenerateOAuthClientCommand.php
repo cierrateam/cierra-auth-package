@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Http;
 class GenerateOAuthClientCommand extends Command
 {
     public $signature = 'cierra-auth:generate-oauth-client 
-                        {name : The name of the OAuth client}
-                        {--redirect=* : Redirect URIs for the OAuth client}';
+                        {name : The name of the OAuth client}';
 
     public $description = 'Generate a temporary OAuth client for development/preview environments';
 
@@ -32,30 +31,12 @@ class GenerateOAuthClientCommand extends Command
         // Get client name from argument
         $clientName = $this->argument('name');
 
-        // Get redirect URIs
-        $redirectUris = $this->option('redirect');
+        // Automatically generate redirect URI from app URL
+        $appUrl = rtrim(config('app.url'), '/');
+        $redirectUri = $appUrl.'/cierra-auth/callback';
+        $redirectUris = [$redirectUri];
 
-        // If no redirect URIs provided, ask for them
-        if (empty($redirectUris)) {
-            $this->info('No redirect URIs provided. Please enter at least one redirect URI.');
-            $redirectUri = $this->ask('Enter redirect URI (e.g., https://example.com/oauth/callback)');
-
-            if (! $redirectUri) {
-                $this->error('At least one redirect URI is required.');
-
-                return self::FAILURE;
-            }
-
-            $redirectUris = [$redirectUri];
-
-            // Ask if they want to add more
-            while ($this->confirm('Add another redirect URI?', false)) {
-                $redirectUri = $this->ask('Enter redirect URI');
-                if ($redirectUri) {
-                    $redirectUris[] = $redirectUri;
-                }
-            }
-        }
+        $this->info("Using redirect URI: {$redirectUri}");
 
         // Make the API request
         $this->info('Creating temporary OAuth client...');
