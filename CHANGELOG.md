@@ -2,6 +2,10 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
+## 0.2.7 - 2025-11-24
+
+**Full Changelog**: https://github.com/cierrateam/cierra-auth-package/compare/0.2.6...0.2.7
+
 ## 0.2.6 - 2025-11-24
 
 ### What's Changed
