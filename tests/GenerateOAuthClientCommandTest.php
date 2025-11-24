@@ -91,4 +91,3 @@ it('accepts multiple redirect URIs', function () {
         ];
     });
 });
-

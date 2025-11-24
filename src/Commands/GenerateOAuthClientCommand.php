@@ -145,4 +145,3 @@ class GenerateOAuthClientCommand extends Command
         $this->warn('⚠ Remember to restart your application to apply the new credentials.');
     }
 }
-

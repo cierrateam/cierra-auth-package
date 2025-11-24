@@ -3,7 +3,7 @@
 use Cierra\Auth\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-//routes with prefix cierra-auth
+// routes with prefix cierra-auth
 
 Route::group(['prefix' => 'cierra-auth', 'middleware' => ['web']], function () {
 

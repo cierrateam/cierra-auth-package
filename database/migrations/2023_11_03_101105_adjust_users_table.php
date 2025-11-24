@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //create first_name column if not exists
+            // create first_name column if not exists
 
             $cols = [
                 [
@@ -52,7 +52,7 @@ return new class extends Migration
                 if (! Schema::hasColumn('users', $col['name'])) {
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable();
                 } else {
-                    //update col type
+                    // update col type
                     $table->{$col['type'] ?? 'string'}($col['name'])->nullable()->change();
                 }
                 // if (isset($col['unique'])) {
