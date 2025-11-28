@@ -7,6 +7,8 @@ You can install the package via composer, if you have the private composer of ci
 
 ### Install the package
 ```bash
+composer config repositories.private-packagist composer https://repo.packagist.com/cierrateam1/
+composer config repositories.packagist.org false
 composer require cierrateam/cierra-auth-package
 ```
 
