@@ -76,7 +76,7 @@ class GenerateOAuthClientCommand extends Command
             $this->line("Expires At:    {$data['expires_at']}");
             $this->newLine();
 
-            $this->updateEnvFile($data['client_id'], $data['client_secret']);
+            $this->writeToStorageFile($data['client_id'], $data['client_secret'], $data['expires_at']);
 
             return self::SUCCESS;
         } catch (\Exception $e) {
@@ -87,45 +87,20 @@ class GenerateOAuthClientCommand extends Command
     }
 
     /**
-     * Update the .env file with the new OAuth credentials
+     * Write the OAuth credentials to a JSON file in the storage directory
      */
-    protected function updateEnvFile(string $clientId, string $clientSecret): void
+    protected function writeToStorageFile(string $clientId, string $clientSecret, string $expiresAt): void
     {
-        $envPath = base_path('.env');
+        $storagePath = storage_path('cierra-auth-oauth.json');
 
-        if (! File::exists($envPath)) {
-            $this->error('.env file not found.');
+        $data = [
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+            'expires_at' => $expiresAt,
+        ];
 
-            return;
-        }
+        File::put($storagePath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-        $envContent = File::get($envPath);
-
-        // Update or add CLIENT_ID
-        if (preg_match('/^CIERRA_AUTH_CLIENT_ID=.*/m', $envContent)) {
-            $envContent = preg_replace(
-                '/^CIERRA_AUTH_CLIENT_ID=.*/m',
-                "CIERRA_AUTH_CLIENT_ID={$clientId}",
-                $envContent
-            );
-        } else {
-            $envContent .= "\nCIERRA_AUTH_CLIENT_ID={$clientId}";
-        }
-
-        // Update or add CLIENT_SECRET
-        if (preg_match('/^CIERRA_AUTH_CLIENT_SECRET=.*/m', $envContent)) {
-            $envContent = preg_replace(
-                '/^CIERRA_AUTH_CLIENT_SECRET=.*/m',
-                "CIERRA_AUTH_CLIENT_SECRET={$clientSecret}",
-                $envContent
-            );
-        } else {
-            $envContent .= "\nCIERRA_AUTH_CLIENT_SECRET={$clientSecret}";
-        }
-
-        File::put($envPath, $envContent);
-
-        $this->info('✓ .env file updated successfully!');
-        $this->warn('⚠ Remember to restart your application to apply the new credentials.');
+        $this->info("✓ OAuth credentials written to {$storagePath}");
     }
 }
