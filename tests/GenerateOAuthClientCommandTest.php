@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 
 it('displays error when enrollment secret is not set', function () {
@@ -30,15 +31,26 @@ it('successfully creates oauth client with auto-generated redirect URI', functio
     ])
         ->expectsOutput('Using redirect URI: https://example.com/cierra-auth/callback')
         ->expectsOutput('✓ OAuth client created successfully!')
-        ->expectsQuestion('Would you like to update your .env file with these credentials?', false)
         ->assertSuccessful();
 
     Http::assertSent(function ($request) {
         return $request->url() === 'https://test.admin.cierra.ai/api/oauth/clients/enroll'
             && $request['name'] === 'Test App'
             && $request['redirect'] === ['https://example.com/cierra-auth/callback']
-            && $request->hasHeader('Authorization', 'X-Client-Enrollment-Secret: test-secret');
+            && $request->hasHeader('X-Client-Enrollment-Secret', 'test-secret');
     });
+
+    // Verify the storage file was created with correct content
+    $storagePath = storage_path('cierra-auth-oauth.json');
+    expect(File::exists($storagePath))->toBeTrue();
+
+    $data = json_decode(File::get($storagePath), true);
+    expect($data['client_id'])->toBe('test-client-id');
+    expect($data['client_secret'])->toBe('test-client-secret');
+    expect($data['expires_at'])->toBe('2025-12-24T00:00:00.000000Z');
+
+    // Clean up
+    File::delete($storagePath);
 });
 
 it('handles API errors gracefully', function () {
@@ -79,10 +91,12 @@ it('strips trailing slash from app URL', function () {
     $this->artisan('cierra-auth:generate-oauth-client', [
         'name' => 'Test App',
     ])
-        ->expectsQuestion('Would you like to update your .env file with these credentials?', false)
         ->assertSuccessful();
 
     Http::assertSent(function ($request) {
         return $request['redirect'] === ['https://example.com/cierra-auth/callback'];
     });
+
+    // Clean up
+    File::delete(storage_path('cierra-auth-oauth.json'));
 });
