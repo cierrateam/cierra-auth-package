@@ -48,6 +48,9 @@ it('successfully creates oauth client with auto-generated redirect URI', functio
     expect($data['client_id'])->toBe('test-client-id');
     expect($data['client_secret'])->toBe('test-client-secret');
     expect($data['expires_at'])->toBe('2025-12-24T00:00:00.000000Z');
+
+    // Clean up
+    File::delete($storagePath);
 });
 
 it('handles API errors gracefully', function () {
@@ -93,4 +96,7 @@ it('strips trailing slash from app URL', function () {
     Http::assertSent(function ($request) {
         return $request['redirect'] === ['https://example.com/cierra-auth/callback'];
     });
+
+    // Clean up
+    File::delete(storage_path('cierra-auth-oauth.json'));
 });
