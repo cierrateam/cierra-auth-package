@@ -2,6 +2,12 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
+## v0.3.0 — Licensing v1 - 2026-04-24
+
+License facade, EnforceLicense middleware, webhook receiver. Zero breaking changes from 0.2.x — all new behavior is config-gated OFF by default.
+
+See CHANGELOG.md for full notes and upgrade path.
+
 ## 0.3.0 - 2026-04-24
 
 ### Added — Licensing v1
