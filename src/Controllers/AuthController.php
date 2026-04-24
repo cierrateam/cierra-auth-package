@@ -100,6 +100,13 @@ class AuthController extends Controller
 
         FacadesAuth::guard('web')->login($user, true);
 
+        // Warm license context cache (fail-open: don't block login on context fetch failure)
+        try {
+            app(\Cierra\Auth\Services\ContextService::class)->forUser($user);
+        } catch (\Throwable $e) {
+            logger()->warning('[cierra-auth] failed to warm license context after login: '.$e->getMessage());
+        }
+
         return redirect(config('cierra-auth-package.redirect_after_login'));
     }
 
