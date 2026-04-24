@@ -10,4 +10,14 @@ return [
 
     'registers_app_id' => env('CIERRA_APP_ID', null),
     'client_enrollment_secret' => env('CIERRA_AUTH_CLIENT_ENROLLMENT_SECRET', null),
+
+    // License enforcement (v0.3.0+)
+    'required_application_slug' => env('CIERRA_APP_SLUG', null),
+    'required_features' => [],
+    'require_active_seat' => true,
+    'on_license_missing' => 'redirect',
+    'license_missing_redirect' => '/cierra-auth/no-license',
+    'webhook_secret' => env('CIERRA_AUTH_WEBHOOK_SECRET', null),
+    'context_cache_ttl' => 300,
+    'log_webhook_payloads' => false,
 ];

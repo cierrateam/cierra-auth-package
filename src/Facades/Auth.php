@@ -2,10 +2,11 @@
 
 namespace Cierra\Auth\Facades;
 
+use Cierra\Auth\Skeleton;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Cierra\Auth\Skeleton
+ * @see Skeleton
  */
 class Auth extends Facade
 {

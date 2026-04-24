@@ -4,6 +4,9 @@ namespace Cierra\Auth;
 
 use Cierra\Auth\Commands\CierraAuthCommand;
 use Cierra\Auth\Commands\GenerateOAuthClientCommand;
+use Cierra\Auth\Middleware\EnforceLicense;
+use Cierra\Auth\Services\ContextService;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\File;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -39,6 +42,18 @@ class AuthServiceProvider extends PackageServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         $this->loadOAuthCredentialsFromStorageFile();
+        $this->registerMiddleware();
+
+        // Register facade accessor binding
+        $this->app->singleton('cierra-auth.license', ContextService::class);
+        $this->app->singleton(ContextService::class, ContextService::class);
+    }
+
+    protected function registerMiddleware(): void
+    {
+        /** @var Router $router */
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('license', EnforceLicense::class);
     }
 
     /**

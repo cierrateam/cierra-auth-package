@@ -1,5 +1,6 @@
 <?php
 
+use Cierra\Auth\AuthServiceProvider;
 use Illuminate\Support\Facades\File;
 
 it('loads OAuth credentials from storage file when enrollment secret is set', function () {
@@ -17,7 +18,7 @@ it('loads OAuth credentials from storage file when enrollment secret is set', fu
     ]));
 
     // Re-boot the service provider to trigger loading from storage
-    $provider = $this->app->getProvider(\Cierra\Auth\AuthServiceProvider::class);
+    $provider = $this->app->getProvider(AuthServiceProvider::class);
     $provider->boot();
 
     expect(config('cierra-auth-package.client_id'))->toBe('storage-client-id');
@@ -42,7 +43,7 @@ it('does not load from storage file when enrollment secret is not set', function
     ]));
 
     // Re-boot the service provider
-    $provider = $this->app->getProvider(\Cierra\Auth\AuthServiceProvider::class);
+    $provider = $this->app->getProvider(AuthServiceProvider::class);
     $provider->boot();
 
     expect(config('cierra-auth-package.client_id'))->toBe('env-client-id');
@@ -63,7 +64,7 @@ it('uses config values when storage file does not exist', function () {
     File::delete($storagePath);
 
     // Re-boot the service provider
-    $provider = $this->app->getProvider(\Cierra\Auth\AuthServiceProvider::class);
+    $provider = $this->app->getProvider(AuthServiceProvider::class);
     $provider->boot();
 
     expect(config('cierra-auth-package.client_id'))->toBe('env-client-id');
@@ -81,7 +82,7 @@ it('handles invalid JSON in storage file gracefully', function () {
     File::put($storagePath, 'invalid json content');
 
     // Re-boot the service provider
-    $provider = $this->app->getProvider(\Cierra\Auth\AuthServiceProvider::class);
+    $provider = $this->app->getProvider(AuthServiceProvider::class);
     $provider->boot();
 
     expect(config('cierra-auth-package.client_id'))->toBe('env-client-id');
