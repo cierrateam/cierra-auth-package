@@ -6,7 +6,6 @@ use Cierra\Auth\Commands\CierraAuthCommand;
 use Cierra\Auth\Commands\GenerateOAuthClientCommand;
 use Cierra\Auth\Middleware\EnforceLicense;
 use Cierra\Auth\Services\ContextService;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\File;
 use Spatie\LaravelPackageTools\Package;

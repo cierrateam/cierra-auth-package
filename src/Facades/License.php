@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string|null plan()
  * @method static array seats()
  *
- * @see \Cierra\Auth\Services\ContextService
+ * @see ContextService
  */
 class License extends Facade
 {
