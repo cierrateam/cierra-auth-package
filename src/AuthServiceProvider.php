@@ -4,8 +4,10 @@ namespace Cierra\Auth;
 
 use Cierra\Auth\Commands\CierraAuthCommand;
 use Cierra\Auth\Commands\GenerateOAuthClientCommand;
+use Cierra\Auth\Contracts\TeamResolver;
 use Cierra\Auth\Middleware\EnforceLicense;
 use Cierra\Auth\Services\ContextService;
+use Cierra\Auth\Services\JetstreamTeamResolver;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\File;
 use Spatie\LaravelPackageTools\Package;
@@ -47,6 +49,11 @@ class AuthServiceProvider extends PackageServiceProvider
         // Register facade accessor binding
         $this->app->singleton('cierra-auth.license', ContextService::class);
         $this->app->singleton(ContextService::class, ContextService::class);
+
+        // Default team resolver: legacy Jetstream-style behavior.
+        // Host apps with a non-Jetstream team model can rebind this
+        // contract (e.g. to NullTeamResolver) in their own service provider.
+        $this->app->bindIf(TeamResolver::class, JetstreamTeamResolver::class);
     }
 
     protected function registerMiddleware(): void
