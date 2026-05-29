@@ -2,6 +2,28 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
+## 0.4.0 — Pluggable TeamResolver - 2026-05-29
+
+### Changed
+
+Post-login team-bootstrap is now resolved through a `Cierra\\Auth\\Contracts\\TeamResolver` contract.
+
+- **Default:** `JetstreamTeamResolver` — fully backwards compatible (same calls, same Botflow AccessGroup integration). No action needed for existing apps.
+  
+- **For non-Jetstream apps** (e.g. workspace-scoped team schemas): bind `NullTeamResolver` or your own implementation in your service provider:
+  
+  ```php
+  use Cierra\\Auth\\Contracts\\TeamResolver;
+  use Cierra\\Auth\\Services\\NullTeamResolver;
+  
+  \$this->app->bind(TeamResolver::class, NullTeamResolver::class);
+  
+  ```
+- `App\\Models\\Team` / Botflow references are now guarded by `class_exists` / `method_exists`.
+  
+
+Fixes `Call to undefined method App\\Models\\User::ownedTeams()` for host apps with a non-Jetstream User model (e.g. crm.cierra.ai).
+
 ## 0.4.0 - 2026-05-29
 
 ### Changed — Pluggable team handling (post-login)
@@ -9,22 +31,26 @@ All notable changes to `cierra-auth-package` will be documented in this file.
 The post-login team-bootstrap (previously hard-coded to Jetstream-style `ownedTeams()` / `currentTeam` / `switchTeam()` calls and a `personal_team` / `user_id` Team schema) is now resolved through a `Cierra\Auth\Contracts\TeamResolver` contract.
 
 - Default binding: `Cierra\Auth\Services\JetstreamTeamResolver` — fully backwards compatible with 0.3.x behavior; same code path, same side-effects, same Botflow `AccessGroup` integration when present.
+  
 - Host apps with a non-Jetstream team model (e.g. workspace-scoped many-to-many teams, multi-tenant CRMs) can bind their own resolver in a service provider:
-
+  
   ```php
   // app/Providers/AppServiceProvider.php
   use Cierra\Auth\Contracts\TeamResolver;
   use Cierra\Auth\Services\NullTeamResolver;
-
+  
   public function register(): void
   {
       $this->app->bind(TeamResolver::class, NullTeamResolver::class);
   }
+  
   ```
-
 - Shipped resolvers: `JetstreamTeamResolver` (default), `NullTeamResolver` (no-op for apps that manage teams elsewhere).
+  
 - Removed: `AuthController::handleUserTeams()` and `AuthController::createTeam()` (logic moved to `JetstreamTeamResolver`). Public surface of `AuthController` unchanged.
+  
 - The `App\Models\Team` and `Cierra\LaravelBotflow\Models\AccessGroup` references inside `JetstreamTeamResolver` are now `class_exists` / `method_exists`-guarded so the package no longer hard-requires those classes on apps that bind a different resolver.
+  
 
 Fixes: `Call to undefined method App\Models\User::ownedTeams()` for host apps with a workspace-scoped team schema (e.g. crm.cierra.ai).
 
