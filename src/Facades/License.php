@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static bool has(string $feature)
  * @method static bool active()
+ * @method static bool canAccess(string|null $slug = null)
  * @method static CarbonInterface|null expiresAt()
  * @method static string|null plan()
  * @method static array seats()
@@ -40,6 +41,31 @@ class License extends Facade
         $context = app(ContextService::class)->forCurrentUser();
 
         return $context->hasApplicationLicense($appSlug);
+    }
+
+    /**
+     * Whether the current user may open the given app (defaults to the
+     * configured required_application_slug). Prefers the central verdict,
+     * falling back to the license check when the server provides none.
+     */
+    public static function canAccess(?string $slug = null): bool
+    {
+        $appSlug = $slug ?? config('cierra-auth-package.required_application_slug');
+
+        if (! $appSlug) {
+            return true;
+        }
+
+        $context = app(ContextService::class)->forCurrentUser();
+
+        // Use the same decision the EnforceLicense middleware uses, so the
+        // facade can never report access the middleware would block (or vice
+        // versa) — including seat and required-feature gating.
+        return $context->permitsAccess(
+            $appSlug,
+            (bool) config('cierra-auth-package.require_active_seat', true),
+            (array) config('cierra-auth-package.required_features', []),
+        );
     }
 
     public static function expiresAt(): ?CarbonInterface

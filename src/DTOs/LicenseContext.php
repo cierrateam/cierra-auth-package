@@ -29,6 +29,102 @@ class LicenseContext
         return $this->data['licenses'] ?? [];
     }
 
+    /**
+     * Per-application access verdicts resolved centrally by admin.cierra.ai.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function applications(): array
+    {
+        return $this->data['applications'] ?? [];
+    }
+
+    /**
+     * The central access verdict for a single application slug, if present.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function applicationAccess(string $slug): ?array
+    {
+        foreach ($this->applications() as $application) {
+            if (($application['slug'] ?? null) === $slug) {
+                return $application;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the central authority says this user may open the given app.
+     *
+     * Returns null when the server did not include a verdict for this slug
+     * (e.g. an older admin.cierra.ai), so callers can fall back to the
+     * license-based checks below.
+     */
+    public function canAccess(string $slug): ?bool
+    {
+        $access = $this->applicationAccess($slug);
+
+        // Treat a missing block AND an explicit null value as "no verdict", so
+        // callers fall back to the license/seat checks rather than hard-denying.
+        if ($access === null || ($access['can_access'] ?? null) === null) {
+            return null;
+        }
+
+        return (bool) $access['can_access'];
+    }
+
+    /**
+     * Machine-readable reason for the access verdict (e.g. "free", "no_seat").
+     */
+    public function accessReason(string $slug): ?string
+    {
+        return $this->applicationAccess($slug)['reason'] ?? null;
+    }
+
+    /**
+     * The single, authoritative access decision shared by the EnforceLicense
+     * middleware and the License facade so they can never diverge.
+     *
+     * Order of precedence:
+     *  1. central verdict (free apps pass, licensed apps require license+seat);
+     *     a `no_seat` denial is ignored when the app opted out via
+     *     $requireActiveSeat = false (preserves v0.4 behaviour);
+     *  2. no verdict (older server) → license + optional seat check;
+     *  3. configured required features must all be present.
+     *
+     * @param  array<int, string>  $requiredFeatures
+     */
+    public function permitsAccess(string $slug, bool $requireActiveSeat = true, array $requiredFeatures = []): bool
+    {
+        $verdict = $this->canAccess($slug);
+
+        if ($verdict === false) {
+            // Honour require_active_seat=false: a seat-only denial must not block
+            // apps that have opted out of seat enforcement.
+            if (! ($requireActiveSeat === false && $this->accessReason($slug) === 'no_seat')) {
+                return false;
+            }
+        } elseif ($verdict === null) {
+            if (! $this->hasApplicationLicense($slug)) {
+                return false;
+            }
+
+            if ($requireActiveSeat && ! $this->hasSeat($slug)) {
+                return false;
+            }
+        }
+
+        foreach ($requiredFeatures as $feature) {
+            if (! $this->hasFeature($feature)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function hasApplicationLicense(string $slug): bool
     {
         foreach ($this->licenses() as $license) {

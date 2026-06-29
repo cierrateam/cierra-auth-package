@@ -6,7 +6,7 @@ Composer package that consuming Laravel apps install to authenticate against `ad
 - PHP 8.2+, Laravel 11/12/13
 - Package namespace: `Cierra\Auth\`
 - Repo: `cierrateam/cierra-auth-package` (packagist private)
-- Current version: 0.2.4 (on `main`)
+- Current version: 0.5.0 (on `main`)
 
 ## Package Structure
 ```
@@ -33,12 +33,13 @@ database/migrations/
 3. admin.cierra.ai authenticates → redirects back to `/cierra-auth/callback?code=...`
 4. `AuthController@callback` exchanges code for token, fetches `/api/user`, syncs User+Team locally, `Auth::login()`.
 
-## What We're Adding (this PR)
-- **License enforcement** — a middleware that blocks login if user doesn't have required license/feature/seat for this app.
-- **Feature-check helper** — `Cierra\Auth\Facades\License::has('analytics')` usable in blades/controllers.
-- **Webhook receiver** — `/cierra-auth/webhook` route that admin.cierra.ai hits on `license.suspended` etc., signed with HMAC; invalidates cache and optionally logs users out.
-- **Context cache** — after callback, pull `/api/me/context` (one call, user + team + licenses + features) and cache per-user with short TTL.
-- **New config keys** in `config/cierra-auth.php`:
+## Already Shipped (v0.3.0–v0.5.0) — the section below was the original plan; it's now DONE
+- ✅ **License enforcement** — `Cierra\Auth\Middleware\EnforceLicense` (alias `license`) blocks access without the required access/license/feature/seat.
+- ✅ **Central app-access verdict (v0.5.0)** — the middleware now prefers the per-app verdict from `/api/me/context` (`applications[]`, `can_access` + `reason`): **free/public apps pass without a license**, licensed apps still need an active license (+ seat). Falls back to the license check against older servers. Helpers: `LicenseContext::canAccess()/accessReason()`, `License::canAccess()`.
+- ✅ **Feature-check helper** — `Cierra\Auth\Facades\License::has('analytics')` usable in blades/controllers.
+- ✅ **Webhook receiver** — `/cierra-auth/webhook`, HMAC-verified (`X-Cierra-Signature`); flushes context cache + dispatches `LicenseChanged`.
+- ✅ **Context cache** — `ContextService` pulls `/api/me/context` and caches per-user (TTL `context_cache_ttl`, default 300s), fail-open.
+- Config keys live in `config/cierra-auth-package.php`:
   - `required_application_slug` (str, default from env `CIERRA_APP_SLUG`)
   - `required_features` (array, default `[]`)
   - `require_active_seat` (bool, default `true`)
