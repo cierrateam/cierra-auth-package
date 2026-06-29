@@ -29,6 +29,58 @@ class LicenseContext
         return $this->data['licenses'] ?? [];
     }
 
+    /**
+     * Per-application access verdicts resolved centrally by admin.cierra.ai.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function applications(): array
+    {
+        return $this->data['applications'] ?? [];
+    }
+
+    /**
+     * The central access verdict for a single application slug, if present.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function applicationAccess(string $slug): ?array
+    {
+        foreach ($this->applications() as $application) {
+            if (($application['slug'] ?? null) === $slug) {
+                return $application;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Whether the central authority says this user may open the given app.
+     *
+     * Returns null when the server did not include a verdict for this slug
+     * (e.g. an older admin.cierra.ai), so callers can fall back to the
+     * license-based checks below.
+     */
+    public function canAccess(string $slug): ?bool
+    {
+        $access = $this->applicationAccess($slug);
+
+        if ($access === null || ! array_key_exists('can_access', $access)) {
+            return null;
+        }
+
+        return (bool) $access['can_access'];
+    }
+
+    /**
+     * Machine-readable reason for the access verdict (e.g. "free", "no_seat").
+     */
+    public function accessReason(string $slug): ?string
+    {
+        return $this->applicationAccess($slug)['reason'] ?? null;
+    }
+
     public function hasApplicationLicense(string $slug): bool
     {
         foreach ($this->licenses() as $license) {

@@ -33,16 +33,30 @@ class EnforceLicense
 
         $context = $this->contextService->forUser($user);
 
-        if (! $context->hasApplicationLicense($requiredAppSlug)) {
+        // Prefer the central access verdict resolved by admin.cierra.ai. This
+        // is the single source of truth: free/public apps are allowed without
+        // a license, licensed apps require an active license (+ seat).
+        $verdict = $context->canAccess($requiredAppSlug);
+
+        if ($verdict === false) {
             return $this->handleMissingLicense($request);
         }
 
-        $requireActiveSeat = config('cierra-auth-package.require_active_seat', true);
+        // $verdict === null → the server returned no per-app verdict (older
+        // admin.cierra.ai). Fall back to the license/seat checks for BC.
+        if ($verdict === null) {
+            if (! $context->hasApplicationLicense($requiredAppSlug)) {
+                return $this->handleMissingLicense($request);
+            }
 
-        if ($requireActiveSeat && ! $context->hasSeat($requiredAppSlug)) {
-            return $this->handleMissingLicense($request);
+            $requireActiveSeat = config('cierra-auth-package.require_active_seat', true);
+
+            if ($requireActiveSeat && ! $context->hasSeat($requiredAppSlug)) {
+                return $this->handleMissingLicense($request);
+            }
         }
 
+        // Additional feature gating (applies regardless of how access was granted).
         $requiredFeatures = config('cierra-auth-package.required_features', []);
 
         foreach ($requiredFeatures as $feature) {

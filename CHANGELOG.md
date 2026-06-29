@@ -2,6 +2,26 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
+## 0.5.0 — Central app-access verdict - 2026-06-29
+
+### Added
+
+- `LicenseContext::canAccess(string $slug): ?bool` and `accessReason(string $slug): ?string`,
+  reading the per-application access verdict now returned by admin.cierra.ai in
+  the `applications` block of `/api/me/context`.
+- `License::canAccess(?string $slug = null)` facade helper for blades/controllers.
+
+### Changed
+
+- `EnforceLicense` middleware now prefers the **central access verdict** as the
+  single source of truth: free / public apps are allowed without a license,
+  license-required apps still require an active license (+ seat). When the
+  server returns no verdict for the slug (older admin.cierra.ai), it falls back
+  to the previous license/seat checks, so behaviour is unchanged against older
+  servers. `required_features` gating still applies in both paths.
+
+No config changes and no breaking changes — existing apps keep working.
+
 ## 0.4.0 — Pluggable TeamResolver - 2026-05-29
 
 ### Changed
