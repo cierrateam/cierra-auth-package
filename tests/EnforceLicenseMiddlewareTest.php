@@ -77,6 +77,26 @@ it('denies via fallback when no verdict and no license', function () {
     $this->get('/protected')->assertRedirect('/cierra-auth/no-license');
 });
 
+it('allows a seat-only denial when require_active_seat is false (BC with v0.4)', function () {
+    config(['cierra-auth-package.require_active_seat' => false]);
+    fakeContext(['applications' => [
+        ['slug' => 'crm', 'can_access' => false, 'reason' => 'no_seat'],
+    ]]);
+    protectedRoute();
+
+    $this->get('/protected')->assertOk();
+});
+
+it('still blocks a no_license denial even when require_active_seat is false', function () {
+    config(['cierra-auth-package.require_active_seat' => false]);
+    fakeContext(['applications' => [
+        ['slug' => 'crm', 'can_access' => false, 'reason' => 'no_license'],
+    ]]);
+    protectedRoute();
+
+    $this->get('/protected')->assertRedirect('/cierra-auth/no-license');
+});
+
 it('passes through when no required_application_slug is configured', function () {
     config(['cierra-auth-package.required_application_slug' => null]);
     fakeContext([]);

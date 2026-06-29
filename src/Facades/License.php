@@ -58,13 +58,14 @@ class License extends Facade
 
         $context = app(ContextService::class)->forCurrentUser();
 
-        $verdict = $context->canAccess($appSlug);
-
-        if ($verdict !== null) {
-            return $verdict;
-        }
-
-        return $context->hasApplicationLicense($appSlug);
+        // Use the same decision the EnforceLicense middleware uses, so the
+        // facade can never report access the middleware would block (or vice
+        // versa) — including seat and required-feature gating.
+        return $context->permitsAccess(
+            $appSlug,
+            (bool) config('cierra-auth-package.require_active_seat', true),
+            (array) config('cierra-auth-package.required_features', []),
+        );
     }
 
     public static function expiresAt(): ?CarbonInterface

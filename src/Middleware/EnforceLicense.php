@@ -33,36 +33,15 @@ class EnforceLicense
 
         $context = $this->contextService->forUser($user);
 
-        // Prefer the central access verdict resolved by admin.cierra.ai. This
-        // is the single source of truth: free/public apps are allowed without
-        // a license, licensed apps require an active license (+ seat).
-        $verdict = $context->canAccess($requiredAppSlug);
-
-        if ($verdict === false) {
-            return $this->handleMissingLicense($request);
-        }
-
-        // $verdict === null → the server returned no per-app verdict (older
-        // admin.cierra.ai). Fall back to the license/seat checks for BC.
-        if ($verdict === null) {
-            if (! $context->hasApplicationLicense($requiredAppSlug)) {
-                return $this->handleMissingLicense($request);
-            }
-
-            $requireActiveSeat = config('cierra-auth-package.require_active_seat', true);
-
-            if ($requireActiveSeat && ! $context->hasSeat($requiredAppSlug)) {
-                return $this->handleMissingLicense($request);
-            }
-        }
-
-        // Additional feature gating (applies regardless of how access was granted).
+        // Single, shared access decision (also used by the License facade):
+        // prefers the central verdict from admin.cierra.ai — free/public apps
+        // pass without a license, licensed apps require a license (+ seat) —
+        // and falls back to the license/seat checks against older servers.
+        $requireActiveSeat = config('cierra-auth-package.require_active_seat', true);
         $requiredFeatures = config('cierra-auth-package.required_features', []);
 
-        foreach ($requiredFeatures as $feature) {
-            if (! $context->hasFeature($feature)) {
-                return $this->handleMissingLicense($request);
-            }
+        if (! $context->permitsAccess($requiredAppSlug, $requireActiveSeat, $requiredFeatures)) {
+            return $this->handleMissingLicense($request);
         }
 
         return $next($request);
