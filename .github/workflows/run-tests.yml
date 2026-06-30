@@ -12,14 +12,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.2, 8.1]
-        laravel: [10.*]
-        stability: [prefer-lowest, prefer-stable]
+        # Curated valid PHP x Laravel x testbench combinations matching the
+        # package's composer constraints (php ^8.2, illuminate ^11|^12|^13).
+        # Laravel 13 requires PHP >= 8.3, so combos are listed explicitly
+        # rather than as a cross-product to avoid impossible pairs.
         include:
-          - laravel: 10.*
-            testbench: 8.*
-            carbon: ^2.63
+          - { os: ubuntu-latest, php: '8.2', laravel: '11.*', testbench: '9.*', carbon: '^3', stability: prefer-lowest }
+          - { os: ubuntu-latest, php: '8.2', laravel: '11.*', testbench: '9.*', carbon: '^3', stability: prefer-stable }
+          - { os: ubuntu-latest, php: '8.3', laravel: '12.*', testbench: '10.*', carbon: '^3', stability: prefer-stable }
+          - { os: ubuntu-latest, php: '8.4', laravel: '13.*', testbench: '11.*', carbon: '^3', stability: prefer-stable }
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 

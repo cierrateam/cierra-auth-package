@@ -84,6 +84,9 @@ class Auth
                 try {
                     $user->forceFill($local)->save();
                 } catch (\Throwable $e) {
+                    // Discard the dirty in-memory attributes so the session
+                    // user doesn't display values that never hit the database.
+                    $user->discardChanges();
                     logger()->warning('[cierra-auth] failed to mirror mail signature locally: '.$e->getMessage());
                 }
             }
