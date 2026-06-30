@@ -2,7 +2,7 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
-## 0.6.0 — Mail signature sync - 2026-06-30
+## 1.2.0 — Mail signature sync - 2026-06-30
 
 ### Added
 
@@ -20,7 +20,7 @@ All notable changes to `cierra-auth-package` will be documented in this file.
   the change locally, and flushes the cached context. Requires admin.cierra.ai
   with the `/api/me/mail-signature` endpoint.
 
-## 0.5.0 — Central app-access verdict - 2026-06-29
+## 1.1.0 — Central app-access verdict - 2026-06-30
 
 ### Added
 
