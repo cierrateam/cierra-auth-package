@@ -12,18 +12,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # Curated valid PHP x Laravel x testbench combinations matching the
-        # package's composer constraints (php ^8.2, illuminate ^11|^12|^13).
-        # Laravel 13 requires PHP >= 8.3, so combos are listed explicitly
-        # rather than as a cross-product to avoid impossible pairs.
-        # Laravel 13 is supported at runtime (illuminate ^13) but is not yet
-        # CI-tested here: pestphp/pest-plugin-laravel has no Laravel 13 release.
-        # Add a 13.* row once the plugin supports it.
+        os: [ubuntu-latest, windows-latest]
+        php: [8.2, 8.1]
+        laravel: [10.*]
+        stability: [prefer-lowest, prefer-stable]
         include:
-          - { os: ubuntu-latest, php: '8.2', laravel: '11.*', testbench: '9.*', carbon: '^3', stability: prefer-lowest }
-          - { os: ubuntu-latest, php: '8.2', laravel: '11.*', testbench: '9.*', carbon: '^3', stability: prefer-stable }
-          - { os: ubuntu-latest, php: '8.3', laravel: '12.*', testbench: '10.*', carbon: '^3', stability: prefer-stable }
-          - { os: ubuntu-latest, php: '8.4', laravel: '12.*', testbench: '10.*', carbon: '^3', stability: prefer-stable }
+          - laravel: 10.*
+            testbench: 8.*
+            carbon: ^2.63
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
