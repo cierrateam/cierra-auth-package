@@ -1,8 +1,24 @@
 <?php
 
 use Cierra\Auth\Auth;
+use Cierra\Auth\Services\ContextService;
 use Illuminate\Auth\GenericUser;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Minimal Eloquent + Authenticatable user backed by the test `users` table,
+ * used to exercise the local-mirror branch of updateMailSignature().
+ */
+class MirrorUser extends Authenticatable
+{
+    protected $table = 'users';
+
+    public $timestamps = false;
+
+    protected $guarded = [];
+}
 
 beforeEach(function () {
     config(['cierra-auth-package.host' => 'https://admin.test']);
@@ -63,4 +79,54 @@ it('returns false when the central profile update fails', function () {
     $this->be(new GenericUser(['id' => 1, 'token' => 'user-token']));
 
     expect(Auth::updateMailSignature('<sig>'))->toBeFalse();
+});
+
+it('does not fatal mirroring onto a non-eloquent user even when columns exist', function () {
+    Schema::create('users', function ($table) {
+        $table->id();
+        $table->string('email')->nullable();
+        $table->string('position')->nullable();
+        $table->longText('mail_signature')->nullable();
+    });
+
+    Http::fake(['admin.test/api/me/mail-signature' => Http::response([], 200)]);
+
+    // GenericUser has no forceFill/save — the helper must skip the mirror.
+    $this->be(new GenericUser(['id' => 1, 'token' => 'user-token']));
+
+    expect(Auth::updateMailSignature('<sig>', 'CTO'))->toBeTrue();
+});
+
+it('mirrors the signature onto the local eloquent user and flushes context', function () {
+    Schema::create('users', function ($table) {
+        $table->id();
+        $table->string('email')->nullable();
+        $table->string('token')->nullable();
+        $table->string('position')->nullable();
+        $table->longText('mail_signature')->nullable();
+    });
+
+    Http::fake(['admin.test/api/me/mail-signature' => Http::response([], 200)]);
+
+    // Record flush() calls without making a real context fetch.
+    $spy = new class extends ContextService
+    {
+        public $flushedFor = null;
+
+        public function flush($user): void
+        {
+            $this->flushedFor = $user->id;
+        }
+    };
+    app()->instance(ContextService::class, $spy);
+
+    $user = MirrorUser::create(['email' => 'a@b.c', 'token' => 'user-token']);
+    $this->be($user);
+
+    expect(Auth::updateMailSignature('<sig>', 'CTO'))->toBeTrue();
+
+    $fresh = MirrorUser::find($user->id);
+    expect($fresh->mail_signature)->toBe('<sig>')
+        ->and($fresh->position)->toBe('CTO')
+        ->and($spy->flushedFor)->toBe($user->id);
 });

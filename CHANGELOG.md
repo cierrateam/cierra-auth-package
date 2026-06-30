@@ -8,10 +8,12 @@ All notable changes to `cierra-auth-package` will be documented in this file.
 
 - New migration adding nullable `position` and `mail_signature` columns to the
   `users` table (guarded by `hasColumn`, additive, reversible).
-- The OAuth callback now syncs `position` (e.g. sourced from Entra ID upstream)
-  and `mail_signature` from admin.cierra.ai's `/api/user` into the local user
-  record when those columns exist. `position` is only overwritten when the
-  central record carries a value, so a locally edited title survives.
+- The OAuth callback now mirrors `position` (e.g. sourced from Entra ID
+  upstream) and `mail_signature` from admin.cierra.ai's `/api/user` into the
+  local user record when those columns exist. Both are synced whenever the key
+  is present in the response (including `null`, so the central value — the
+  source of truth — is mirrored exactly); a field omitted by an older admin is
+  left untouched.
 - `Auth::updateMailSignature(string $signature, ?string $position = null): bool`
   facade helper that writes the user's default mail signature (and optional job
   title) back to the central profile via `PUT /api/me/mail-signature`, mirrors

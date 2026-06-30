@@ -3,6 +3,7 @@
 namespace Cierra\Auth;
 
 use Cierra\Auth\Services\ContextService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -62,19 +63,30 @@ class Auth
             return false;
         }
 
-        // Reflect the saved values locally so the UI is consistent right away.
-        $local = [];
+        // Reflect the saved values onto the local user record so the UI is
+        // consistent right away. Only when the authenticated user is an
+        // Eloquent model carrying the columns — in stateless/API contexts the
+        // user may be a GenericUser (no forceFill/save), and the remote write
+        // is already the source of truth, so we simply skip the local mirror.
+        if ($user instanceof Model) {
+            $table = $user->getTable();
+            $local = [];
 
-        if (Schema::hasColumn('users', 'mail_signature')) {
-            $local['mail_signature'] = $signature;
-        }
+            if (Schema::hasColumn($table, 'mail_signature')) {
+                $local['mail_signature'] = $signature;
+            }
 
-        if ($position !== null && Schema::hasColumn('users', 'position')) {
-            $local['position'] = $position;
-        }
+            if ($position !== null && Schema::hasColumn($table, 'position')) {
+                $local['position'] = $position;
+            }
 
-        if (! empty($local)) {
-            $user->forceFill($local)->save();
+            if ($local !== []) {
+                try {
+                    $user->forceFill($local)->save();
+                } catch (\Throwable $e) {
+                    logger()->warning('[cierra-auth] failed to mirror mail signature locally: '.$e->getMessage());
+                }
+            }
         }
 
         // The central profile changed; drop any cached context for this user.
