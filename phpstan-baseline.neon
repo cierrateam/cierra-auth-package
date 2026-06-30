@@ -1,0 +1,25 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Controllers/AuthController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Guard\:\:login\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Controllers/AuthController.php
+
+		-
+			message: '#^Call to static method updateOrCreate\(\) on an unknown class App\\Models\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controllers/AuthController.php
+
+		-
+			message: '#^Property Cierra\\Auth\\Controllers\\WebhookController\:\:\$contextService is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Controllers/WebhookController.php

@@ -66,8 +66,13 @@ class Auth
         // Reflect the saved values onto the local user record so the UI is
         // consistent right away. Only when the authenticated user is an
         // Eloquent model carrying the columns — in stateless/API contexts the
-        // user may be a GenericUser (no forceFill/save), and the remote write
-        // is already the source of truth, so we simply skip the local mirror.
+        // user may be a GenericUser (no DB row), and the remote write is the
+        // source of truth, so we simply skip the local mirror.
+        //
+        // We issue a targeted keyed UPDATE of just these columns (rather than
+        // forceFill()->save() on the shared instance) so we neither persist nor
+        // roll back any unrelated in-memory edits the caller may hold, and only
+        // sync the in-memory values once the write actually succeeds.
         if ($user instanceof Model) {
             $table = $user->getTable();
             $local = [];
@@ -82,11 +87,9 @@ class Auth
 
             if ($local !== []) {
                 try {
-                    $user->forceFill($local)->save();
+                    $user->newQuery()->whereKey($user->getKey())->update($local);
+                    $user->forceFill($local);
                 } catch (\Throwable $e) {
-                    // Discard the dirty in-memory attributes so the session
-                    // user doesn't display values that never hit the database.
-                    $user->discardChanges();
                     logger()->warning('[cierra-auth] failed to mirror mail signature locally: '.$e->getMessage());
                 }
             }
