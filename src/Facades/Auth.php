@@ -2,11 +2,14 @@
 
 namespace Cierra\Auth\Facades;
 
-use Cierra\Auth\Skeleton;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see Skeleton
+ * @method static string getLoginUrl()
+ * @method static \Illuminate\Contracts\Auth\Authenticatable|null user()
+ * @method static bool updateMailSignature(string $signature, ?string $position = null)
+ *
+ * @see \Cierra\Auth\Auth
  */
 class Auth extends Facade
 {

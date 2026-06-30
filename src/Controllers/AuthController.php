@@ -85,6 +85,18 @@ class AuthController extends Controller
             $userData['name'] = $passportUser['first_name'].' '.$passportUser['last_name'];
         }
 
+        // Sync the job title (e.g. populated from Entra ID upstream) when the
+        // consuming app carries the column. Only overwrite when the central
+        // record actually has a value, so a locally edited position survives.
+        if (Schema::hasColumn('users', 'position') && ! empty($passportUser['position'])) {
+            $userData['position'] = $passportUser['position'];
+        }
+
+        // Sync the user's default mail signature from the central profile.
+        if (Schema::hasColumn('users', 'mail_signature') && array_key_exists('mail_signature', $passportUser)) {
+            $userData['mail_signature'] = $passportUser['mail_signature'];
+        }
+
         // if there is a password field, fill it with random string
         if (Schema::hasColumn('users', 'password')) {
             $userData['password'] = bcrypt(Str::random(16));
