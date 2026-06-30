@@ -85,6 +85,18 @@ class AuthController extends Controller
             $userData['name'] = $passportUser['first_name'].' '.$passportUser['last_name'];
         }
 
+        // Mirror the centrally-owned profile fields from /api/user when the
+        // consuming app carries the columns. admin.cierra.ai is the source of
+        // truth, so we sync whenever the key is present (including null) to stay
+        // in sync — and simply skip the field when an older admin omits it.
+        if (Schema::hasColumn('users', 'position') && array_key_exists('position', $passportUser)) {
+            $userData['position'] = $passportUser['position'];
+        }
+
+        if (Schema::hasColumn('users', 'mail_signature') && array_key_exists('mail_signature', $passportUser)) {
+            $userData['mail_signature'] = $passportUser['mail_signature'];
+        }
+
         // if there is a password field, fill it with random string
         if (Schema::hasColumn('users', 'password')) {
             $userData['password'] = bcrypt(Str::random(16));

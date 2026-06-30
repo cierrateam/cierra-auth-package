@@ -6,7 +6,7 @@ Composer package that consuming Laravel apps install to authenticate against `ad
 - PHP 8.2+, Laravel 11/12/13
 - Package namespace: `Cierra\Auth\`
 - Repo: `cierrateam/cierra-auth-package` (packagist private)
-- Current version: 0.5.0 (on `main`)
+- Current version: 0.6.0 (on `main`)
 
 ## Package Structure
 ```
@@ -39,6 +39,7 @@ database/migrations/
 - ✅ **Feature-check helper** — `Cierra\Auth\Facades\License::has('analytics')` usable in blades/controllers.
 - ✅ **Webhook receiver** — `/cierra-auth/webhook`, HMAC-verified (`X-Cierra-Signature`); flushes context cache + dispatches `LicenseChanged`.
 - ✅ **Context cache** — `ContextService` pulls `/api/me/context` and caches per-user (TTL `context_cache_ttl`, default 300s), fail-open.
+- ✅ **Mail signature sync (v0.6.0)** — migration adds nullable `position` + `mail_signature` to `users`; the callback syncs both from `/api/user`. `Auth::updateMailSignature($html, $position = null)` writes the default signature back to the central profile (`PUT /api/me/mail-signature`) and mirrors it locally. This is the mechanism that flows a signature created in the signature generator out to the CRM (and any other consuming app) on next login.
 - Config keys live in `config/cierra-auth-package.php`:
   - `required_application_slug` (str, default from env `CIERRA_APP_SLUG`)
   - `required_features` (array, default `[]`)

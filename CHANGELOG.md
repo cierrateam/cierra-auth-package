@@ -2,6 +2,24 @@
 
 All notable changes to `cierra-auth-package` will be documented in this file.
 
+## 0.6.0 — Mail signature sync - 2026-06-30
+
+### Added
+
+- New migration adding nullable `position` and `mail_signature` columns to the
+  `users` table (guarded by `hasColumn`, additive, reversible).
+- The OAuth callback now mirrors `position` (e.g. sourced from Entra ID
+  upstream) and `mail_signature` from admin.cierra.ai's `/api/user` into the
+  local user record when those columns exist. Both are synced whenever the key
+  is present in the response (including `null`, so the central value — the
+  source of truth — is mirrored exactly); a field omitted by an older admin is
+  left untouched.
+- `Auth::updateMailSignature(string $signature, ?string $position = null): bool`
+  facade helper that writes the user's default mail signature (and optional job
+  title) back to the central profile via `PUT /api/me/mail-signature`, mirrors
+  the change locally, and flushes the cached context. Requires admin.cierra.ai
+  with the `/api/me/mail-signature` endpoint.
+
 ## 0.5.0 — Central app-access verdict - 2026-06-29
 
 ### Added
